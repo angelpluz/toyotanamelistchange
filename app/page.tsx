@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-
 import Select from "react-select";
 import * as XLSX from "xlsx";
-
+import { StylesConfig } from "react-select";
 // ✅ ตรวจจับ Mobile Mode
 const useMediaQuery = (query: string) => {
   const [matches, setMatches] = useState(false);
@@ -53,6 +52,33 @@ export default function Home() {
   const isMobile = useMediaQuery("(max-width: 768px)"); // ตรวจจับหน้าจอขนาดเล็ก
 
   const filePath = "/Series Current Sales Fill Thai Name as of 03022025.xlsx";
+
+  // ✅ กำหนดสีของ select บน Android
+  const customSelectStyles: StylesConfig<SelectOption, false> = {
+    control: (styles) => ({
+      ...styles,
+      backgroundColor: "white",
+      color: "black",
+      borderColor: "#ccc",
+      "&:hover": { borderColor: "#888" },
+      boxShadow: "none",
+    }),
+    singleValue: (styles) => ({
+      ...styles,
+      color: "black",
+    }),
+    option: (styles, { isSelected }) => ({
+      ...styles,
+      backgroundColor: isSelected ? "#007bff" : "white",
+      color: isSelected ? "white" : "black",
+      "&:hover": { backgroundColor: "#ddd", color: "black" },
+    }),
+    menu: (styles) => ({
+      ...styles,
+      backgroundColor: "white",
+      color: "black",
+    }),
+  };
 
   useEffect(() => {
     setIsClient(true);
@@ -120,13 +146,13 @@ export default function Home() {
                 row["รุ่น"]?.trim() === selectedGrade.value.trim()
             )
             .map((row) => row["สีภาษาไทย"])
-            .filter(Boolean) // ✅ กรองเฉพาะค่าที่ไม่เป็น `null` หรือ `undefined`
+            .filter(Boolean)
         )
       ).map((name) => ({
-        value: name?.trim() || "", // ✅ ป้องกัน Error เมื่อ `name` เป็น `undefined`
-        label: name?.trim() || "" // ✅ ป้องกัน Error
+        value: name?.trim() || "",
+        label: name?.trim() || "",
       }));
-  
+
       setColorOptions(filteredColors);
       setSelectedColor(null);
     }
@@ -163,9 +189,9 @@ export default function Home() {
 
       {isClient && (
         <div className={`${isMobile ? "flex flex-col gap-4" : "flex gap-4"} mb-4`}>
-          <Select options={seriesOptions} value={selectedSeries} onChange={setSelectedSeries} isClearable placeholder="เลือก Series Name" className="w-full" />
-          <Select options={gradeOptions} value={selectedGrade} onChange={setSelectedGrade} isClearable placeholder="เลือก Grade Name" className="w-full" />
-          <Select options={colorOptions} value={selectedColor} onChange={setSelectedColor} isClearable placeholder="เลือก Color Name" className="w-full" />
+          <Select styles={customSelectStyles} options={seriesOptions} value={selectedSeries} onChange={setSelectedSeries} isClearable placeholder="เลือก Series Name" className="w-full" />
+          <Select styles={customSelectStyles} options={gradeOptions} value={selectedGrade} onChange={setSelectedGrade} isClearable placeholder="เลือก Grade Name" className="w-full" />
+          <Select styles={customSelectStyles} options={colorOptions} value={selectedColor} onChange={setSelectedColor} isClearable placeholder="เลือก Color Name" className="w-full" />
           <button onClick={handleClearFilters} className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition w-full">เคลียร์ตัวกรอง</button>
         </div>
       )}
@@ -185,7 +211,6 @@ export default function Home() {
     ))}
   </div>
 )}
-
     </main>
   );
 }
